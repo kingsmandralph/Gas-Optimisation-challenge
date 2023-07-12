@@ -1,4 +1,4 @@
-# Gas Optimization Bounty by StackUp
+# Gas Optimization Bounty by StackUp Explanation
 
 ![12 July - Gas Optimisation Challenge](https://github.com/clement-stackup/gas_challenge/assets/120361535/21c826fb-8776-4837-a8fe-b7040426eafa)
 
@@ -20,36 +20,29 @@ To successfully complete this bounty, you will need to apply the following gas o
 
 4. **For Loop Increment Syntax**: Using a different for loop increment syntax can help reduce gas consumption
 
-## Getting Started
-
-To get started, clone this repository to your local machine and navigate to the project directory. Next, install the required dependencies.
-
-```bash
-git clone https://github.com/clement-stackup/gas_challenge.git
-cd gas_challenge && npm install
+## Explanation of gas optimisation technique used
+```js
+function optimizedFunction() public {
+        uint[10] memory cachedVar = numbers; // caching the numbers arrays
+        for (uint i = 0; i < cachedVar.length; ) {
+            // using the unchecked block
+            unchecked {
+                numbers[i] = 0;
+                ++i; //used ++i instead of i++ is cheaper
+            }
+        }
+    }
 ```
+The `optimizedFunction` is designed to reduce the gas cost of setting all elements of the `numbers` array to 0. 
 
-Once you have cloned the repository and installed the necessary dependencies, open the `contracts/gasChallenge.sol` file to view the smart contract and apply the following gas optimization techniques above.
+1. The function creates a local memory variable `cachedVar` and assigns it the value of the `numbers` array. This is done to cache the `numbers` array in memory, which is cheaper to access than storage.
 
-## Test Smart Contract
+2. The function then enters a `for` loop that iterates over the length of the `cachedVar` array.
 
-Next, head over to `test/test_gasChallenge.js`. You are required to write a unit test under the describe block to check that after running the gas optimized function, the sum of array is 0. Once you have implemented the test block, proceed the run the following command to test your smart contract.
+3. Inside the loop, an `unchecked` block is used. This means that arithmetic operations inside this block will not revert if an overflow or underflow occurs. This can save gas because the Solidity compiler does not need to generate code to check for overflows or underflows.
 
-```bash
-npx hardhat test
-```
+4. Inside the `unchecked` block, the function sets the current element of the `numbers` array to 0.
 
-This command will test the smart contract and compute the estimated gas cost. This is computed using the [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter) library.
+5. The loop counter `i` is then incremented using the pre-increment operator (`++i`) instead of the post-increment operator (`i++`). This can save a small amount of gas because the pre-increment operator does not need to create a temporary variable to store the original value of `i`.
 
-The library has been configured to output the estimated gas costs to a new `gas-report.txt` file on your root directory. You can then view the estimated gas consumption for each of the smart contract functions in this file. The `optimizedFunction()` should output a lower gas consumption to the `notOptimizedFunction()` as shown below.
-
-![Screenshot 2023-07-11 at 2 34 24 PM](https://github.com/clement-stackup/gas_challenge/assets/120361535/99e33517-5974-40a1-aa87-279051e58e42)
-
-This command will also check if the sum of the array returns 0. You can refer below to view the terminal console when all tests have passed!
-
-![image](https://github.com/clement-stackup/gas_challenge/assets/120361535/760df9a2-c9f5-4c0f-af50-7a88093bdbda)
-
-## Bounty Submission
-
-Upload all your working files to your GitHub Repository and submit your GitHub Repository URL to the StackUp Gas Optimization Challenge Bounty Page to successfully complete this challenge!
-
+Overall, the `optimizedFunction` uses several techniques to reduce gas costs, including caching storage variables in memory, using unchecked arithmetic, and using pre-increment instead of post-increment. These techniques can help make the function more efficient and cheaper to execute.
